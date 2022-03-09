@@ -136,7 +136,9 @@ func (h *queuedWorkloadHandler) Create(e event.CreateEvent, q workqueue.RateLimi
 func (h *queuedWorkloadHandler) Update(e event.UpdateEvent, q workqueue.RateLimitingInterface) {
 	oldQW := e.ObjectOld.(*kueue.QueuedWorkload)
 	newQW := e.ObjectOld.(*kueue.QueuedWorkload)
-	q.Add(requestForQueueStatus(newQW))
+	if workloadStatus(oldQW) != workloadStatus(newQW) {
+		q.Add(requestForQueueStatus(newQW))
+	}
 	if newQW.Spec.QueueName != oldQW.Spec.QueueName {
 		q.Add(requestForQueueStatus(oldQW))
 	}
